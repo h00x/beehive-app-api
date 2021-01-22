@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class RegisterTest extends TestCase
@@ -11,12 +12,14 @@ class RegisterTest extends TestCase
 
     public function test_a_new_user_can_register()
     {
-        $response = $this->postJson('/api/register', [
+        $user = [
             'name' => 'Dave',
             'email' => 'dave@test.com',
             'password' => 'secretPasssword',
             'password_confirmation' => 'secretPasssword',
-        ]);
+        ];
+
+        $response = $this->postJson('/api/register', $user);
 
         $response
             ->assertStatus(200)
@@ -25,6 +28,8 @@ class RegisterTest extends TestCase
                 'message' => 'Successfully registered',
                 'code' => 200,
             ]);
+
+        $this->assertDatabaseHas('users', Arr::except($user, ['password', 'password_confirmation']));
     }
 
     public function test_a_new_user_cannot_use_wrong_credentials()
