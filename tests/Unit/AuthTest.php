@@ -3,11 +3,14 @@
 namespace Tests\Unit;
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_a_user_can_login()
     {
         $password = 'secret';
@@ -22,7 +25,7 @@ class AuthTest extends TestCase
             ->assertStatus(200)
             ->assertJson([
                 'status' => 'success',
-                'message' => 'Successfully logged in',
+                'message' => 'Successfully logged in.',
                 'code' => 200,
             ]);
     }
@@ -38,7 +41,7 @@ class AuthTest extends TestCase
             ->assertStatus(401)
             ->assertJson([
                 'status' => 'error',
-                'message' => 'Provided credentials are incorrect',
+                'message' => 'Provided credentials are incorrect.',
                 'code' => 401,
             ]);
     }
@@ -52,7 +55,7 @@ class AuthTest extends TestCase
             ->assertStatus(401)
             ->assertJson([
                 'status' => 'error',
-                'message' => 'Provided credentials are incorrect',
+                'message' => 'Provided credentials are incorrect.',
                 'code' => 401,
             ]);
     }

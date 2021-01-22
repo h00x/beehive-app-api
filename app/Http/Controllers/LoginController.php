@@ -27,14 +27,14 @@ class LoginController extends Controller
             return response()
                 ->json([
                     'status' => 'success',
-                    'message' => 'Successfully logged in',
+                    'message' => 'Successfully logged in.',
                     'code' => JsonResponse::HTTP_OK,
                     'user' => Auth::user()
                     ])
                 ->setStatusCode(200);
         }
 
-        throw new AuthenticationException('Provided credentials are incorrect');
+        throw new AuthenticationException('Provided credentials are incorrect.');
     }
 
     /**
@@ -49,7 +49,7 @@ class LoginController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Successfully logged out',
+            'message' => 'Successfully logged out.',
             'code' => JsonResponse::HTTP_OK,
         ])
             ->setStatusCode(200);

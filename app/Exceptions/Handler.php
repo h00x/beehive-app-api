@@ -59,7 +59,7 @@ class Handler extends ExceptionHandler
     {
         if ($exception instanceof ModelNotFoundException && $request->wantsJson()) {
             return response()->json([
-                'message' => 'Model not found',
+                'message' => 'Model not found.',
                 'status' => 'error',
                 'code' => JsonResponse::HTTP_NOT_FOUND,
             ], JsonResponse::HTTP_NOT_FOUND);
@@ -67,7 +67,7 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof NotFoundHttpException && $request->wantsJson()) {
             return response()->json([
-                'message' => 'Endpoint not found',
+                'message' => 'Endpoint not found.',
                 'status' => 'error',
                 'code' => JsonResponse::HTTP_NOT_FOUND,
             ], JsonResponse::HTTP_NOT_FOUND);
@@ -85,15 +85,14 @@ class Handler extends ExceptionHandler
 //            abort(JsonResponse::HTTP_METHOD_NOT_ALLOWED, 'Method not allowed');
 //        }
 //
-//        if ($request->isJson() && $exception instanceof ValidationException) {
-//            return response()->json([
-//                'status' => 'error',
-//                'message' => [
-//                    'errors' => $exception->getMessage(),
-//                    'fields' => $exception->validator->getMessageBag()->toArray()
-//                ]
-//            ], JsonResponse::HTTP_PRECONDITION_FAILED);
-//        }
+        if ($request->isJson() && $exception instanceof ValidationException) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+                'status' => 'error',
+                'code' => JsonResponse::HTTP_UNPROCESSABLE_ENTITY,
+                'errors' => $exception->validator->getMessageBag()->toArray(),
+            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         return parent::render($request, $exception);
     }
