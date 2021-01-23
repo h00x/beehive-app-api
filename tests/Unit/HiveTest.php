@@ -177,4 +177,87 @@ class HiveTest extends TestCase
                 'code' => 200,
             ]);
     }
+
+    public function test_an_unauthenticated_user_cannot_get_hives()
+    {
+        User::factory()
+            ->has(Hive::factory()->count(4))
+            ->create();
+
+        $response = $this->getJson('/api/hives');
+
+        $response
+            ->assertStatus(401)
+            ->assertExactJson([
+                'status' => 'error',
+                'message' => 'Unauthenticated.',
+                'code' => 401,
+            ]);
+    }
+
+    public function test_you_can_update_a_hive()
+    {
+        $user = User::factory()
+            ->has(Hive::factory()->count(4))
+            ->create();
+
+        $this->signIn($user);
+
+        $updatedHive = [
+            'name' => 'changed title',
+        ];
+
+        $response = $this->patchJson('/api/hives/' . $user->hives()->first()->id, $updatedHive);
+
+        $response
+            ->assertStatus(200)
+            ->assertExactJson([
+                'hive' => $user->hives()->first()->toArray(),
+                'status' => 'success',
+                'message' => 'Successfully updated Hive',
+                'code' => 200,
+            ]);
+
+        $this->assertDatabaseHas('hives', $updatedHive);
+    }
+
+    public function test_a_unauthenticated_user_cannot_update_the_hive_of_an_other_user()
+    {
+
+    }
+
+    public function test_updating_a_hive_with_invalid_data_returns_an_error()
+    {
+        $user = User::factory()
+            ->has(Hive::factory()->count(4))
+            ->create();
+
+        $this->signIn($user);
+
+        $updatedHive = [
+            'empty' => 'true',
+            'archived' => 33
+        ];
+
+        $response = $this->patchJson('/api/hives/' . $user->hives()->first()->id, $updatedHive);
+
+        $response
+            ->assertStatus(422)
+            ->assertJson([
+                'status' => 'error',
+                'message' => 'The given data was invalid.',
+                'code' => 422,
+                'errors' => [
+                    'name' => [
+                        'The name field is required.'
+                    ],
+                    'empty' => [
+                        'The empty field must be true or false.'
+                    ],
+                    'archived' => [
+                        'The archived field must be true or false.'
+                    ],
+                ],
+            ]);
+    }
 }

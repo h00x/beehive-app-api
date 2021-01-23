@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\HiveRequest;
 use App\Http\Resources\HiveCollection;
 use App\Models\Hive;
+use HttpException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -74,13 +75,26 @@ class HiveController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
+     * @param HiveRequest $request
      * @param Hive $hive
-     * @return Response
+     * @return JsonResponse
+     * @throws HttpException
      */
-    public function update(Request $request, Hive $hive)
+    public function update(HiveRequest $request, Hive $hive)
     {
-        //
+        try {
+            $hive->update($request->validated());
+
+            return response()->json([
+                'hive' => $hive,
+                'status' => 'success',
+                'message' => 'Successfully updated Hive',
+                'code' => JsonResponse::HTTP_OK,
+            ])
+                ->setStatusCode(JsonResponse::HTTP_OK);
+        } catch (\Exception $exception) {
+            throw new HttpException($exception->getMessage(), 400);
+        }
     }
 
     /**
