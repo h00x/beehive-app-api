@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\HiveRequest;
+use App\Http\Resources\HiveCollection;
 use App\Models\Hive;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,11 +14,31 @@ class HiveController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function index()
     {
-        //
+        $hives = auth()->user()->hives()->paginate(10);
+
+        if ($hives->isEmpty()) {
+            return (new HiveCollection($hives))
+                ->additional([
+                    'status' => 'error',
+                    'message' => 'No hives found.',
+                    'code' => JsonResponse::HTTP_NOT_FOUND,
+                ])
+                ->response()
+                ->setStatusCode(JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return (new HiveCollection($hives))
+            ->additional([
+                'status' => 'success',
+                'message' => 'Successfully found the hives.',
+                'code' => JsonResponse::HTTP_OK,
+            ])
+            ->response()
+            ->setStatusCode(JsonResponse::HTTP_OK);
     }
 
     /**
@@ -31,10 +52,10 @@ class HiveController extends Controller
         $hive = auth()->user()->hives()->create($request->validated());
 
         return response()->json([
+            'hive' => $hive,
             'status' => 'success',
             'message' => 'Successfully created the hive.',
             'code' => JsonResponse::HTTP_CREATED,
-            'hive' => $hive
         ])
             ->setStatusCode(JsonResponse::HTTP_CREATED);
     }

@@ -22,7 +22,9 @@ class HiveFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->name,
+            'empty' => $this->faker->boolean,
+            'archived' => $this->faker->boolean,
         ];
     }
 }

@@ -26,10 +26,10 @@ class LoginController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             return response()
                 ->json([
+                    'user' => Auth::user(),
                     'status' => 'success',
                     'message' => 'Successfully logged in.',
                     'code' => JsonResponse::HTTP_OK,
-                    'user' => Auth::user()
                     ])
                 ->setStatusCode(200);
         }

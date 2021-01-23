@@ -25,10 +25,10 @@ class RegisterController extends Controller
 
         return response()
             ->json([
+                'user' => $user,
                 'status' => 'success',
                 'message' => 'Successfully registered',
                 'code' => JsonResponse::HTTP_OK,
-                'user' => $user
             ])
             ->setStatusCode(200);
     }
