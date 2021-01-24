@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -75,10 +76,18 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof AuthenticationException && $request->expectsJson()) {
             return response()->json([
-            'message' => $exception->getMessage(),
-            'status' => 'error',
-            'code' => JsonResponse::HTTP_UNAUTHORIZED,
-        ], JsonResponse::HTTP_UNAUTHORIZED);
+                'message' => $exception->getMessage(),
+                'status' => 'error',
+                'code' => JsonResponse::HTTP_UNAUTHORIZED,
+            ], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        if ($exception instanceof HttpException && $request->wantsJson()) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+                'status' => 'error',
+                'code' => $exception->getStatusCode(),
+            ], $exception->getStatusCode());
         }
 
 //        if ($exception instanceof MethodNotAllowedHttpException) {

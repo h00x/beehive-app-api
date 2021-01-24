@@ -94,7 +94,7 @@ class HiveTest extends TestCase
             ]);
     }
 
-    public function test_a_user_cannot_get_the_hives_of_an_other_user()
+    public function test_a_get_on_hives_only_returns_the_hives_the_user_is_authenticated_for()
     {
         $user1 = User::factory()
             ->has(Hive::factory()->count(4))
@@ -223,7 +223,29 @@ class HiveTest extends TestCase
 
     public function test_a_unauthenticated_user_cannot_update_the_hive_of_an_other_user()
     {
+        $user1 = User::factory()
+            ->has(Hive::factory()->count(4))
+            ->create();
 
+        $user2 = User::factory()->create();
+
+        $this->signIn($user2);
+
+        $updatedHive = [
+            'name' => 'changed title',
+        ];
+
+        $response = $this->patchJson('/api/hives/' . $user1->hives()->first()->id, $updatedHive);
+
+        $response
+            ->assertStatus(403)
+            ->assertExactJson([
+                'status' => 'error',
+                'message' => 'You do not own this post.',
+                'code' => 403,
+            ]);
+
+        $this->assertDatabaseMissing('hives', $updatedHive);
     }
 
     public function test_updating_a_hive_with_invalid_data_returns_an_error()
@@ -258,6 +280,112 @@ class HiveTest extends TestCase
                         'The archived field must be true or false.'
                     ],
                 ],
+            ]);
+    }
+
+    public function test_updating_a_hive_with_a_not_existing_id_returns_an_error()
+    {
+        $user = User::factory()
+            ->has(Hive::factory())
+            ->create();
+
+        $this->signIn($user);
+
+        $updatedHive = [
+            'name' => 'changed title',
+        ];
+
+        $response = $this->patchJson('/api/hives/mangled', $updatedHive);
+
+        $response
+            ->assertStatus(404)
+            ->assertExactJson([
+                'status' => 'error',
+                'message' => 'Model not found.',
+                'code' => 404,
+            ]);
+
+        $this->assertDatabaseMissing('hives', $updatedHive);
+    }
+
+    public function test_you_can_get_a_single_hive()
+    {
+        $user = User::factory()
+            ->has(Hive::factory()->count(4))
+            ->create();
+
+        $this->signIn($user);
+
+        $response = $this->getJson('/api/hives/' . $user->hives()->latest()->first()->id);
+
+        $response
+            ->assertStatus(200)
+            ->assertExactJson([
+                'hive' => $user->hives()->latest()->first()->toArray(),
+                'status' => 'success',
+                'message' => 'Successfully found the hive.',
+                'code' => 200,
+            ]);
+    }
+
+    public function test_getting_a_single_hive_with_a_not_existing_id_returns_an_error()
+    {
+        $user = User::factory()
+            ->has(Hive::factory()->count(4))
+            ->create();
+
+        $this->signIn($user);
+
+        $response = $this->getJson('/api/hives/934298');
+
+        $response
+            ->assertStatus(404)
+            ->assertExactJson([
+                'status' => 'error',
+                'message' => 'Model not found.',
+                'code' => 404,
+            ]);
+    }
+
+    public function test_you_can_delete_a_hive()
+    {
+        $user = User::factory()
+            ->has(Hive::factory()->count(4))
+            ->create();
+
+        $this->signIn($user);
+
+        $hive = $user->hives()->latest()->first();
+
+        $response = $this->deleteJson('/api/hives/' . $hive->id);
+
+        $response
+            ->assertStatus(200)
+            ->assertExactJson([
+                'status' => 'success',
+                'message' => 'Successfully deleted the Hive.',
+                'code' => 200,
+            ]);
+
+        $this->assertDatabaseMissing('hives', $hive->toArray());
+    }
+
+    public function test_deleting_a_hive_with_a_not_existing_id_returns_an_error()
+    {
+        $user = User::factory()
+            ->has(Hive::factory()->count(4))
+            ->create();
+
+        $this->signIn($user);
+
+        $response = $this->deleteJson('/api/hives/932498');
+
+        $response
+            ->assertStatus(404)
+            ->assertExactJson([
+                'status' => 'error',
+                'message' => 'Model not found.',
+                'code' => 404,
             ]);
     }
 }
