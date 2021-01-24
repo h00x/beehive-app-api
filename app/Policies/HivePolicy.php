@@ -34,7 +34,7 @@ class HivePolicy
     {
         return $user->id === $hive->user_id
             ? Response::allow()
-            : Response::deny('You do not own this post.', JsonResponse::HTTP_FORBIDDEN);
+            : Response::deny('You are not allowed to view this hive.', JsonResponse::HTTP_FORBIDDEN);
     }
 
     /**
@@ -59,7 +59,7 @@ class HivePolicy
     {
         return $user->id === $hive->user_id
             ? Response::allow()
-            : Response::deny('You do not own this post.', JsonResponse::HTTP_FORBIDDEN);
+            : Response::deny('You are not allowed to update this hive.', JsonResponse::HTTP_FORBIDDEN);
     }
 
     /**
@@ -73,7 +73,7 @@ class HivePolicy
     {
         return $user->id === $hive->user_id
             ? Response::allow()
-            : Response::deny('You do not own this post.', JsonResponse::HTTP_FORBIDDEN);
+            : Response::deny('You are not allowed to delete this hive.', JsonResponse::HTTP_FORBIDDEN);
     }
 
     /**
@@ -87,7 +87,7 @@ class HivePolicy
     {
         return $user->id === $hive->user_id
             ? Response::allow()
-            : Response::deny('You do not own this post.', JsonResponse::HTTP_FORBIDDEN);
+            : Response::deny('You do not own this hive.', JsonResponse::HTTP_FORBIDDEN);
     }
 
     /**
@@ -101,6 +101,6 @@ class HivePolicy
     {
         return $user->id === $hive->user_id
             ? Response::allow()
-            : Response::deny('You do not own this post.', JsonResponse::HTTP_FORBIDDEN);
+            : Response::deny('You do not own this hive.', JsonResponse::HTTP_FORBIDDEN);
     }
 }

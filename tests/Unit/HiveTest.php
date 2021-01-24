@@ -214,14 +214,14 @@ class HiveTest extends TestCase
             ->assertExactJson([
                 'hive' => $user->hives()->first()->toArray(),
                 'status' => 'success',
-                'message' => 'Successfully updated Hive',
+                'message' => 'Successfully updated Hive.',
                 'code' => 200,
             ]);
 
         $this->assertDatabaseHas('hives', $updatedHive);
     }
 
-    public function test_a_unauthenticated_user_cannot_update_the_hive_of_an_other_user()
+    public function test_a_unauthorized_user_cannot_update_the_hive_of_an_other_user()
     {
         $user1 = User::factory()
             ->has(Hive::factory()->count(4))
@@ -241,7 +241,7 @@ class HiveTest extends TestCase
             ->assertStatus(403)
             ->assertExactJson([
                 'status' => 'error',
-                'message' => 'You do not own this post.',
+                'message' => 'You are not allowed to update this hive.',
                 'code' => 403,
             ]);
 
@@ -328,6 +328,27 @@ class HiveTest extends TestCase
             ]);
     }
 
+    public function test_an_unauthorized_user_cannot_get_a_hive()
+    {
+        $user = User::factory()->create();
+
+        $user2 = User::factory()
+            ->has(Hive::factory()->count(1))
+            ->create();
+
+        $this->signIn($user);
+
+        $response = $this->getJson('/api/hives/' . $user2->hives()->first()->id);
+
+        $response
+            ->assertStatus(403)
+            ->assertExactJson([
+                'status' => 'error',
+                'message' => 'You are not allowed to view this hive.',
+                'code' => 403,
+            ]);
+    }
+
     public function test_getting_a_single_hive_with_a_not_existing_id_returns_an_error()
     {
         $user = User::factory()
@@ -368,6 +389,27 @@ class HiveTest extends TestCase
             ]);
 
         $this->assertDatabaseMissing('hives', $hive->toArray());
+    }
+
+    public function test_an_unauthorized_user_cannot_delete_a_hive()
+    {
+        $user = User::factory()->create();
+
+        $user2 = User::factory()
+            ->has(Hive::factory()->count(1))
+            ->create();
+
+        $this->signIn($user);
+
+        $response = $this->deleteJson('/api/hives/' . $user2->hives()->first()->id);
+
+        $response
+            ->assertStatus(403)
+            ->assertExactJson([
+                'status' => 'error',
+                'message' => 'You are not allowed to delete this hive.',
+                'code' => 403,
+            ]);
     }
 
     public function test_deleting_a_hive_with_a_not_existing_id_returns_an_error()

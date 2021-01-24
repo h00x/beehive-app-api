@@ -102,7 +102,7 @@ class HiveController extends Controller
             return response()->json([
                 'hive' => $hive,
                 'status' => 'success',
-                'message' => 'Successfully updated Hive',
+                'message' => 'Successfully updated Hive.',
                 'code' => JsonResponse::HTTP_OK,
             ])
                 ->setStatusCode(JsonResponse::HTTP_OK);
