@@ -15,10 +15,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/login', [\App\Http\Controllers\LoginController::class, 'login']);
 Route::post('/register', [\App\Http\Controllers\RegisterController::class, 'register']);
+Route::get('/test', function (Request $request) {
+    return 'test';
+});
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['tenancy'])->group(function () {
+    Route::post('/login', [\App\Http\Controllers\LoginController::class, 'login']);
+    Route::get('/testing', function () {
+        return 'testttt';
+    });
+});
+
+Route::middleware(['tenancy', 'auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
