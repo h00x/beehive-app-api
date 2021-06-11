@@ -19,20 +19,3 @@ Route::post('/register', [\App\Http\Controllers\RegisterController::class, 'regi
 Route::get('/test', function (Request $request) {
     return 'test';
 });
-
-Route::middleware(['tenancy'])->group(function () {
-    Route::post('/login', [\App\Http\Controllers\LoginController::class, 'login']);
-    Route::get('/testing', function () {
-        return 'testttt';
-    });
-});
-
-Route::middleware(['tenancy', 'auth:sanctum'])->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-
-    Route::get('/logout', [\App\Http\Controllers\LoginController::class, 'logout']);
-
-    Route::apiResource('hives', HiveController::class);
-});
