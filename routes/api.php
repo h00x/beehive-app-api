@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\HiveController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/register', [\App\Http\Controllers\RegisterController::class, 'register']);
-Route::get('/test', function (Request $request) {
+Route::get('/', function () {
+    return 'Welcome to the api';
+});
+Route::get('/test', function () {
     return 'test';
 });

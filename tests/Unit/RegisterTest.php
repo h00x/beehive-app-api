@@ -8,10 +8,10 @@ use Tests\TestCase;
 
 class RegisterTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_a_new_user_can_register()
     {
+        $this->withoutExceptionHandling();
+
         $user = [
             'name' => 'Dave',
             'email' => 'dave@test.com',
